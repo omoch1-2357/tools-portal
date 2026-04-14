@@ -41,8 +41,8 @@ export function useToolCatalog(): CatalogState {
           return;
         }
 
-        setTools(sampleTools);
-        setSource("sample");
+        setTools([]);
+        setSource("firestore");
         setError(error instanceof Error ? error.message : "カタログ取得に失敗しました。");
       } finally {
         if (active) {

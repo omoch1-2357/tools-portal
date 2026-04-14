@@ -12,5 +12,5 @@ export type ToolCatalogItem = {
 
 export type ToolPreference = {
   favorite: boolean;
-  updatedAt: string;
+  favoriteUpdatedAt: string;
 };

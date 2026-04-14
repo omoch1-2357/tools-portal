@@ -116,7 +116,7 @@ export function App() {
           </div>
 
           {catalogLoading || preferenceLoading ? <p className="muted">読み込み中です。</p> : null}
-          {catalogError ? <p className="error">一覧を読み込めなかったため、サンプル表示に切り替えています。</p> : null}
+          {catalogError ? <p className="error">一覧を読み込めませんでした。</p> : null}
           {preferenceError ? <p className="error">{preferenceError}</p> : null}
 
           <div className="tool-grid">

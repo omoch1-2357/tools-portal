@@ -26,6 +26,7 @@ type UseToolPreferencesResult = {
 
 export function useToolPreferences(user: User | null, authEnabled: boolean): UseToolPreferencesResult {
   const [state, setState] = useState<ToolPreferenceState>({});
+  const [localStateCache, setLocalStateCache] = useState<ToolPreferenceState>({});
   const [loading, setLoading] = useState(authEnabled);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,8 +34,13 @@ export function useToolPreferences(user: User | null, authEnabled: boolean): Use
     let active = true;
 
     async function load() {
+      const nextLocalState = loadLocalPreferences();
+      if (active) {
+        setLocalStateCache(nextLocalState);
+      }
+
       if (!user) {
-        setState(loadLocalPreferences());
+        setState(nextLocalState);
         setLoading(false);
         return;
       }
@@ -67,7 +73,7 @@ export function useToolPreferences(user: User | null, authEnabled: boolean): Use
 
   const lastSavedLabel = useMemo(() => {
     const timestamps = Object.values(state)
-      .map((value) => Date.parse(value.updatedAt))
+      .map((value) => Date.parse(value.favoriteUpdatedAt))
       .filter((value) => !Number.isNaN(value));
 
     if (timestamps.length === 0) {
@@ -82,7 +88,7 @@ export function useToolPreferences(user: User | null, authEnabled: boolean): Use
       ...state,
       [toolId]: {
         favorite: !state[toolId]?.favorite,
-        updatedAt: new Date().toISOString(),
+        favoriteUpdatedAt: new Date().toISOString(),
       },
     };
 
@@ -95,7 +101,10 @@ export function useToolPreferences(user: User | null, authEnabled: boolean): Use
         return;
       }
 
-      saveLocalPreferences(nextState);
+      if (!saveLocalPreferences(nextState)) {
+        throw new Error("この環境ではローカル保存できませんでした。");
+      }
+      setLocalStateCache(nextState);
     } catch (error) {
       setError(error instanceof Error ? error.message : "保存に失敗しました。");
     }
@@ -106,15 +115,15 @@ export function useToolPreferences(user: User | null, authEnabled: boolean): Use
       return;
     }
 
-    const localState = loadLocalPreferences();
-    if (Object.keys(localState).length === 0) {
+    if (Object.keys(localStateCache).length === 0) {
       return;
     }
 
     try {
-      await savePreferenceBatch(user, localState);
+      await savePreferenceBatch(user, localStateCache);
       clearLocalPreferences();
-      setState((currentState) => ({ ...currentState, ...localState }));
+      setLocalStateCache({});
+      setState((currentState) => ({ ...currentState, ...localStateCache }));
       setError(null);
     } catch (error) {
       setError(error instanceof Error ? error.message : "クラウド同期に失敗しました。");
@@ -127,7 +136,7 @@ export function useToolPreferences(user: User | null, authEnabled: boolean): Use
     error,
     toggleFavorite,
     syncLocalToCloud,
-    hasLocalData: Object.keys(loadLocalPreferences()).length > 0,
+    hasLocalData: Object.keys(localStateCache).length > 0,
     lastSavedLabel,
   };
 }
