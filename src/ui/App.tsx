@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
-import { useAuthState } from "../features/auth/useAuthState";
+
 import { signInWithGitHub, signOutUser } from "../features/auth/authClient";
-import { useToolCatalog } from "../features/catalog/useToolCatalog";
+import { useAuthState } from "../features/auth/useAuthState";
 import { ToolCard } from "../features/catalog/ToolCard";
+import { useToolCatalog } from "../features/catalog/useToolCatalog";
 import { useToolPreferences } from "../features/preferences/useToolPreferences";
 
 export function App() {
@@ -31,11 +32,7 @@ export function App() {
         return true;
       }
 
-      return [
-        tool.name,
-        tool.description,
-        tool.tags.join(" "),
-      ]
+      return [tool.name, tool.description, tool.tags.join(" ")]
         .join(" ")
         .toLowerCase()
         .includes(query);
@@ -58,19 +55,19 @@ export function App() {
           <div className="status-grid">
             <StatusBlock label="カタログ" value={source === "firestore" ? "Firestore" : "Sample"} />
             <StatusBlock label="お気に入り" value={String(favoriteCount)} />
-            <StatusBlock
-              label="保存先"
-              value={user ? "Cloud" : "Local"}
-            />
+            <StatusBlock label="保存先" value={user ? "Cloud" : "Local"} />
           </div>
           <div className="auth-box">
             {authLoading ? (
               <p className="muted">認証状態を確認中です。</p>
             ) : user ? (
               <>
-                <p className="auth-box__title">{user.displayName ?? user.email ?? "ログイン済み"}</p>
+                <p className="auth-box__title">
+                  {user.displayName ?? user.email ?? "ログイン済み"}
+                </p>
                 <p className="muted">
-                  変更は Firestore に保存されます。{lastSavedLabel ? `最終保存: ${lastSavedLabel}` : ""}
+                  変更は Firestore に保存されます。
+                  {lastSavedLabel ? `最終保存: ${lastSavedLabel}` : ""}
                 </p>
                 <button className="secondary-button" onClick={signOutUser}>
                   ログアウト
@@ -79,9 +76,7 @@ export function App() {
             ) : (
               <>
                 <p className="auth-box__title">未ログインでも閲覧とローカル保存は可能です。</p>
-                <p className="muted">
-                  端末をまたいで同期したい場合のみログインします。
-                </p>
+                <p className="muted">端末をまたいで同期したい場合のみログインします。</p>
                 <button
                   className="primary-button"
                   onClick={signInWithGitHub}
@@ -89,7 +84,9 @@ export function App() {
                 >
                   GitHub でログイン
                 </button>
-                {!authEnabled ? <p className="notice">Firebase 設定未投入のため認証は無効です。</p> : null}
+                {!authEnabled ? (
+                  <p className="notice">Firebase 設定未投入のため認証は無効です。</p>
+                ) : null}
               </>
             )}
           </div>
@@ -101,9 +98,7 @@ export function App() {
           <div className="panel__head">
             <div>
               <h2>ツール一覧</h2>
-              <p className="muted">
-                使いたいツールを選んで開けます。
-              </p>
+              <p className="muted">使いたいツールを選んで開けます。</p>
             </div>
             <label className="search">
               <span className="sr-only">検索</span>

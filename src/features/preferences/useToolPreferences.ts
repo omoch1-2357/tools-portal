@@ -1,16 +1,9 @@
 import type { User } from "firebase/auth";
 import { useEffect, useMemo, useState } from "react";
+
 import type { ToolPreference } from "../catalog/types";
-import {
-  clearLocalPreferences,
-  loadLocalPreferences,
-  saveLocalPreferences,
-} from "./storage";
-import {
-  fetchUserPreferences,
-  savePreference,
-  savePreferenceBatch,
-} from "./preferencesService";
+import { fetchUserPreferences, savePreference, savePreferenceBatch } from "./preferencesService";
+import { clearLocalPreferences, loadLocalPreferences, saveLocalPreferences } from "./storage";
 
 type ToolPreferenceState = Record<string, ToolPreference>;
 
@@ -24,7 +17,10 @@ type UseToolPreferencesResult = {
   lastSavedLabel: string | null;
 };
 
-export function useToolPreferences(user: User | null, authEnabled: boolean): UseToolPreferencesResult {
+export function useToolPreferences(
+  user: User | null,
+  authEnabled: boolean,
+): UseToolPreferencesResult {
   const [state, setState] = useState<ToolPreferenceState>({});
   const [localStateCache, setLocalStateCache] = useState<ToolPreferenceState>({});
   const [loading, setLoading] = useState(authEnabled);

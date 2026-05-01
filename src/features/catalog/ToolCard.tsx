@@ -39,12 +39,7 @@ export function ToolCard(props: ToolCardProps) {
           開く
         </a>
         {repoUrl ? (
-          <a
-            className="ghost-button"
-            href={repoUrl}
-            target="_blank"
-            rel="noreferrer"
-          >
+          <a className="ghost-button" href={repoUrl} target="_blank" rel="noreferrer">
             Repo
           </a>
         ) : null}

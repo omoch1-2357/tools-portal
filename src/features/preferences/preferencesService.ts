@@ -1,12 +1,13 @@
+import type { User } from "firebase/auth";
 import {
   collection,
   doc,
   getDocs,
+  type QueryDocumentSnapshot,
   serverTimestamp,
   setDoc,
-  type QueryDocumentSnapshot,
 } from "firebase/firestore";
-import type { User } from "firebase/auth";
+
 import { db } from "../../lib/firebase/client";
 import type { ToolPreference } from "../catalog/types";
 
