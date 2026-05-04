@@ -140,9 +140,7 @@ export function App() {
                 ローカル保存を同期
               </button>
             ) : (
-              <p className="inline-notice">
-                端末間で同期する場合は GitHub ログインを使います。
-              </p>
+              <p className="inline-notice">端末間で同期する場合は GitHub ログインを使います。</p>
             )}
             {!authEnabled ? (
               <p className="inline-warning">Firebase 設定未投入のため認証は無効です。</p>
