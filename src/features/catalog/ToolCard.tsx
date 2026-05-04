@@ -9,9 +9,7 @@ type ToolCardProps = {
 export function ToolCard(props: ToolCardProps) {
   const { tool, favorite, onToggleFavorite } = props;
   const repoUrl = tool.repo.includes("/") ? `https://github.com/${tool.repo}` : null;
-  const updatedLabel = tool.updatedAt
-    ? new Date(tool.updatedAt).toLocaleDateString("ja-JP")
-    : null;
+  const updatedLabel = tool.updatedAt ? new Date(tool.updatedAt).toLocaleDateString("ja-JP") : null;
 
   return (
     <article className="tool-card">
