@@ -1,35 +1,55 @@
 import type { ToolPreference } from "../catalog/types";
 
-const STORAGE_KEY = "tools-portal.preferences";
+export const STORAGE_KEY = "tools-portal.preferences";
 
-function safeGetItem(key: string) {
+export type StorageLike = Pick<Storage, "getItem" | "removeItem" | "setItem">;
+
+function getDefaultStorage(): StorageLike | null {
+  return typeof window === "undefined" ? null : window.localStorage;
+}
+
+function safeGetItem(storage: StorageLike | null, key: string) {
+  if (!storage) {
+    return null;
+  }
+
   try {
-    return window.localStorage.getItem(key);
+    return storage.getItem(key);
   } catch {
     return null;
   }
 }
 
-function safeSetItem(key: string, value: string) {
+function safeSetItem(storage: StorageLike | null, key: string, value: string) {
+  if (!storage) {
+    return false;
+  }
+
   try {
-    window.localStorage.setItem(key, value);
+    storage.setItem(key, value);
     return true;
   } catch {
     return false;
   }
 }
 
-function safeRemoveItem(key: string) {
+function safeRemoveItem(storage: StorageLike | null, key: string) {
+  if (!storage) {
+    return false;
+  }
+
   try {
-    window.localStorage.removeItem(key);
+    storage.removeItem(key);
     return true;
   } catch {
     return false;
   }
 }
 
-export function loadLocalPreferences(): Record<string, ToolPreference> {
-  const rawValue = safeGetItem(STORAGE_KEY);
+export function loadLocalPreferences(
+  storage: StorageLike | null = getDefaultStorage(),
+): Record<string, ToolPreference> {
+  const rawValue = safeGetItem(storage, STORAGE_KEY);
 
   if (!rawValue) {
     return {};
@@ -60,10 +80,13 @@ export function loadLocalPreferences(): Record<string, ToolPreference> {
   }
 }
 
-export function saveLocalPreferences(state: Record<string, ToolPreference>) {
-  return safeSetItem(STORAGE_KEY, JSON.stringify(state));
+export function saveLocalPreferences(
+  state: Record<string, ToolPreference>,
+  storage: StorageLike | null = getDefaultStorage(),
+) {
+  return safeSetItem(storage, STORAGE_KEY, JSON.stringify(state));
 }
 
-export function clearLocalPreferences() {
-  return safeRemoveItem(STORAGE_KEY);
+export function clearLocalPreferences(storage: StorageLike | null = getDefaultStorage()) {
+  return safeRemoveItem(storage, STORAGE_KEY);
 }

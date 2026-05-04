@@ -1,4 +1,3 @@
-import type { User } from "firebase/auth";
 import {
   collection,
   doc,
@@ -9,32 +8,57 @@ import {
 } from "firebase/firestore";
 
 import { db } from "../../lib/firebase/client";
+import { timestampToIso } from "../../lib/firebase/firestoreData";
+import type { AuthUser } from "../auth/types";
 import type { ToolPreference } from "../catalog/types";
 
-function mapPreference(documentSnapshot: QueryDocumentSnapshot): ToolPreference | null {
-  const data = documentSnapshot.data();
+export type PreferenceDocument = {
+  id: string;
+  data: Record<string, unknown>;
+};
 
+export function userAppsCollectionPath(uid: string): [string, string, string] {
+  return ["users", uid, "apps"];
+}
+
+export function userPreferenceDocumentPath(uid: string, toolId: string) {
+  return [...userAppsCollectionPath(uid), toolId] as [string, string, string, string];
+}
+
+export function mapPreferenceDocument(document: PreferenceDocument): ToolPreference | null {
+  const data = document.data;
   if (typeof data.favorite !== "boolean") {
     return null;
   }
 
   return {
     favorite: data.favorite === true,
-    favoriteUpdatedAt:
-      typeof data.favoriteUpdatedAt?.toDate === "function"
-        ? data.favoriteUpdatedAt.toDate().toISOString()
-        : new Date(0).toISOString(),
+    favoriteUpdatedAt: timestampToIso(data.favoriteUpdatedAt) ?? new Date(0).toISOString(),
   };
 }
 
-export async function fetchUserPreferences(user: User) {
+export function preferenceWriteData(preference: ToolPreference, favoriteUpdatedAt: unknown) {
+  return {
+    favorite: preference.favorite,
+    favoriteUpdatedAt,
+  };
+}
+
+function mapPreferenceSnapshot(documentSnapshot: QueryDocumentSnapshot): ToolPreference | null {
+  return mapPreferenceDocument({
+    id: documentSnapshot.id,
+    data: documentSnapshot.data(),
+  });
+}
+
+export async function fetchUserPreferences(user: AuthUser) {
   if (!db) {
     throw new Error("Firestore が利用できません。");
   }
 
-  const snapshot = await getDocs(collection(db, "users", user.uid, "apps"));
+  const snapshot = await getDocs(collection(db, ...userAppsCollectionPath(user.uid)));
   return snapshot.docs.reduce<Record<string, ToolPreference>>((result, documentSnapshot) => {
-    const preference = mapPreference(documentSnapshot);
+    const preference = mapPreferenceSnapshot(documentSnapshot);
     if (!preference) {
       return result;
     }
@@ -44,22 +68,22 @@ export async function fetchUserPreferences(user: User) {
   }, {});
 }
 
-export async function savePreference(user: User, toolId: string, preference: ToolPreference) {
+export async function savePreference(user: AuthUser, toolId: string, preference: ToolPreference) {
   if (!db) {
     throw new Error("Firestore が利用できません。");
   }
 
   await setDoc(
-    doc(db, "users", user.uid, "apps", toolId),
-    {
-      favorite: preference.favorite,
-      favoriteUpdatedAt: serverTimestamp(),
-    },
+    doc(db, ...userPreferenceDocumentPath(user.uid, toolId)),
+    preferenceWriteData(preference, serverTimestamp()),
     { merge: true },
   );
 }
 
-export async function savePreferenceBatch(user: User, preferences: Record<string, ToolPreference>) {
+export async function savePreferenceBatch(
+  user: AuthUser,
+  preferences: Record<string, ToolPreference>,
+) {
   const tasks = Object.entries(preferences).map(([toolId, preference]) =>
     savePreference(user, toolId, preference),
   );

@@ -1,6 +1,26 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { clearLocalPreferences, loadLocalPreferences, saveLocalPreferences } from "./storage";
+import {
+  clearLocalPreferences,
+  loadLocalPreferences,
+  saveLocalPreferences,
+  STORAGE_KEY,
+  type StorageLike,
+} from "./storage";
+
+function createMemoryStorage(): StorageLike {
+  const values = new Map<string, string>();
+
+  return {
+    getItem: (key) => values.get(key) ?? null,
+    removeItem: (key) => {
+      values.delete(key);
+    },
+    setItem: (key, value) => {
+      values.set(key, value);
+    },
+  };
+}
 
 describe("preferences storage", () => {
   beforeEach(() => {
@@ -26,7 +46,7 @@ describe("preferences storage", () => {
 
   it("falls back to legacy updatedAt values", () => {
     window.localStorage.setItem(
-      "tools-portal.preferences",
+      STORAGE_KEY,
       JSON.stringify({
         timer: {
           favorite: true,
@@ -44,9 +64,36 @@ describe("preferences storage", () => {
   });
 
   it("returns an empty object for malformed JSON", () => {
-    window.localStorage.setItem("tools-portal.preferences", "{");
+    window.localStorage.setItem(STORAGE_KEY, "{");
 
     expect(loadLocalPreferences()).toEqual({});
+  });
+
+  it("can use an injected Storage-like adapter", () => {
+    const storage = createMemoryStorage();
+    const state = {
+      clock: {
+        favorite: true,
+        favoriteUpdatedAt: "2026-05-01T00:00:00.000Z",
+      },
+    };
+
+    expect(saveLocalPreferences(state, storage)).toBe(true);
+    expect(loadLocalPreferences(storage)).toEqual(state);
+    expect(clearLocalPreferences(storage)).toBe(true);
+    expect(loadLocalPreferences(storage)).toEqual({});
+  });
+
+  it("reports write failures from injected storage", () => {
+    const storage: StorageLike = {
+      getItem: () => null,
+      removeItem: () => undefined,
+      setItem: () => {
+        throw new Error("blocked");
+      },
+    };
+
+    expect(saveLocalPreferences({}, storage)).toBe(false);
   });
 
   it("clears saved preferences", () => {
