@@ -1,6 +1,6 @@
-import type { User } from "firebase/auth";
 import { useEffect, useMemo, useState } from "react";
 
+import type { AuthUser } from "../auth/types";
 import type { ToolPreference } from "../catalog/types";
 import { fetchUserPreferences, savePreference, savePreferenceBatch } from "./preferencesService";
 import { clearLocalPreferences, loadLocalPreferences, saveLocalPreferences } from "./storage";
@@ -18,7 +18,7 @@ type UseToolPreferencesResult = {
 };
 
 export function useToolPreferences(
-  user: User | null,
+  user: AuthUser | null,
   authEnabled: boolean,
 ): UseToolPreferencesResult {
   const [state, setState] = useState<ToolPreferenceState>({});
