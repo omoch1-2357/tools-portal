@@ -16,7 +16,10 @@ export function ToolCard(props: ToolCardProps) {
       <div className="tool-card__body">
         <div>
           <div className="tool-card__header">
-            <h3>{tool.name}</h3>
+            <div>
+              <span className="tool-card__repo">{tool.repo}</span>
+              <h3>{tool.name}</h3>
+            </div>
             {updatedLabel ? <span className="tool-card__date">{updatedLabel}</span> : null}
           </div>
           <p className="tool-card__description">{tool.description}</p>
@@ -36,8 +39,14 @@ export function ToolCard(props: ToolCardProps) {
           開く
         </a>
         {repoUrl ? (
-          <a className="button button--quiet" href={repoUrl} target="_blank" rel="noreferrer">
-            Repo
+          <a
+            className="button button--quiet"
+            href={repoUrl}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`${tool.name} の GitHub repository を開く`}
+          >
+            GitHub
           </a>
         ) : null}
         <button

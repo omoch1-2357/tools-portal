@@ -8,6 +8,10 @@ type SidebarStatusProps = {
 export function SidebarStatus(props: SidebarStatusProps) {
   return (
     <section className="summary-panel">
+      <div className="panel-heading">
+        <span className="section-label">Status</span>
+        <h2>現在の状態</h2>
+      </div>
       <div className="metric-list">
         <StatusBlock label="表示ツール" value={String(props.visibleToolCount)} />
         <StatusBlock label="保存済み" value={String(props.favoriteCount)} />

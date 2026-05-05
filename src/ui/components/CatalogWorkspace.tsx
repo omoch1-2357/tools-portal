@@ -28,24 +28,28 @@ export function CatalogWorkspace(props: CatalogWorkspaceProps) {
         <div>
           <p className="section-label">Catalog</p>
           <h2 id="tools-heading">ツール一覧</h2>
+          <p>名前、説明、タグから探せます。保存済みだけに絞ることもできます。</p>
         </div>
         <div className="result-count" aria-live="polite">
-          {props.isLoading ? "読み込み中" : `${props.tools.length} 件`}
+          <span>Results</span>
+          <strong>{props.isLoading ? "読み込み中" : `${props.tools.length} 件`}</strong>
         </div>
       </div>
 
-      <SearchControls
-        searchText={props.searchText}
-        showFavoritesOnly={props.showFavoritesOnly}
-        onSearchTextChange={props.onSearchTextChange}
-        onToggleFavoritesOnly={props.onToggleFavoritesOnly}
-      />
+      <div className="filter-panel">
+        <SearchControls
+          searchText={props.searchText}
+          showFavoritesOnly={props.showFavoritesOnly}
+          onSearchTextChange={props.onSearchTextChange}
+          onToggleFavoritesOnly={props.onToggleFavoritesOnly}
+        />
 
-      <TagFilter
-        tags={props.availableTags}
-        activeTag={props.activeTag}
-        onActiveTagChange={props.onActiveTagChange}
-      />
+        <TagFilter
+          tags={props.availableTags}
+          activeTag={props.activeTag}
+          onActiveTagChange={props.onActiveTagChange}
+        />
+      </div>
 
       <WorkspaceStatus
         isLoading={props.isLoading}
