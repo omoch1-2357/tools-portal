@@ -56,6 +56,8 @@ export function App() {
         user={user}
         authLoading={authLoading}
         authEnabled={authEnabled}
+        favoriteCount={favoriteCount}
+        visibleToolCount={visibleCatalogTools.length}
         onSignIn={signInWithGitHub}
         onSignOut={signOutUser}
       />

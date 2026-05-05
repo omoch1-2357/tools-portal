@@ -7,19 +7,22 @@ type SyncPanelProps = {
 };
 
 export function SyncPanel(props: SyncPanelProps) {
+  const modeLabel = props.signedIn ? "Cloud sync" : "Local only";
+
   return (
     <section className="sync-panel">
-      <div>
+      <div className="panel-heading">
+        <span className="section-label">Sync</span>
         <h2>保存状態</h2>
-        <p>
-          {props.signedIn
-            ? "お気に入りはクラウドに保存されます。"
-            : "ログインなしでも、この端末に保存できます。"}
-        </p>
-        {props.lastSavedLabel ? (
-          <p className="save-time">最終保存: {props.lastSavedLabel}</p>
-        ) : null}
       </div>
+      <div className={`sync-mode${props.signedIn ? " is-cloud" : " is-local"}`}>
+        <span>{modeLabel}</span>
+        <strong>
+          {props.signedIn ? "お気に入りはクラウドに保存されます。" : "この端末に保存されています。"}
+        </strong>
+      </div>
+
+      {props.lastSavedLabel ? <p className="save-time">最終保存: {props.lastSavedLabel}</p> : null}
 
       {props.signedIn ? (
         <button
