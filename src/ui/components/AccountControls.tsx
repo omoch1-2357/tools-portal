@@ -15,10 +15,10 @@ export function AccountControls(props: AccountControlsProps) {
   return (
     <div className="portal-account" aria-live="polite">
       {authLoading ? (
-        <>
+        <div className="account-summary">
           <span className="account-label">認証確認中</span>
           <span className="account-note">保存先を確認しています</span>
-        </>
+        </div>
       ) : user ? (
         <>
           <div className="account-summary">

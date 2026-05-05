@@ -9,8 +9,10 @@ type TagFilterProps = {
 export function TagFilter(props: TagFilterProps) {
   return (
     <div className="tag-filter-panel">
-      <span className="filter-label">タグ</span>
-      <div className="tag-row" aria-label="タグで絞り込み">
+      <span className="filter-label" id="tag-filter-label">
+        タグ
+      </span>
+      <div className="tag-row" role="group" aria-labelledby="tag-filter-label">
         <button
           className={`tag-filter${props.activeTag === ALL_TAG_FILTER ? " is-active" : ""}`}
           onClick={() => props.onActiveTagChange(ALL_TAG_FILTER)}
